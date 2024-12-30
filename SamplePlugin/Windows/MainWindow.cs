@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Numerics;
 using Dalamud.Interface.Internal;
 using Dalamud.Interface.Utility;
@@ -12,12 +13,13 @@ public class MainWindow : Window, IDisposable
 {
     private string GoatImagePath;
     private Plugin Plugin;
+    private bool show_everything = false;
 
     // We give this window a hidden ID using ##
     // So that the user will see "My Amazing Window" as window title,
     // but for ImGui the ID is "My Amazing Window##With a hidden ID"
     public MainWindow(Plugin plugin, string goatImagePath)
-        : base("My Amazing Window##With a hidden ID", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
+        : base("MATUNO IS A STALKER##With a hidden ID", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse)
     {
         SizeConstraints = new WindowSizeConstraints
         {
@@ -30,29 +32,86 @@ public class MainWindow : Window, IDisposable
     }
 
     public void Dispose() { }
+        String search_text = "";
 
     public override void Draw()
     {
-        ImGui.Text($"The random config bool is {Plugin.Configuration.SomePropertyToBeSavedAndWithADefault}");
-
-        if (ImGui.Button("Show Settings"))
+        if (ImGui.Button("DEW IT"))
         {
-            Plugin.ToggleConfigUI();
+            Plugin.Snoop();
         }
-
-        ImGui.Spacing();
-
-        ImGui.Text("Have a goat:");
-        var goatImage = Plugin.TextureProvider.GetFromFile(GoatImagePath).GetWrapOrDefault();
-        if (goatImage != null)
+        ImGui.SameLine();
+        if (Plugin.accounts.Count == 0)
         {
-            ImGuiHelpers.ScaledIndent(55f);
-            ImGui.Image(goatImage.ImGuiHandle, new Vector2(goatImage.Width, goatImage.Height));
-            ImGuiHelpers.ScaledIndent(-55f);
+            ImGui.BeginDisabled();
         }
-        else
+        if (ImGui.Button("DUMP IT"))
         {
-            ImGui.Text("Image not found.");
+            Plugin.Dump("stalk_backup.csv");
         }
+        ImGui.EndDisabled();
+        ImGui.SameLine();
+        if (Plugin.accounts.Count != 0)
+        {
+            ImGui.BeginDisabled();
+        }
+        if (ImGui.Button("RESTORE IT"))
+        {
+            Plugin.Restore();
+        }
+        ImGui.EndDisabled();
+        ImGui.SameLine();
+        if (ImGui.Button("deleet"))
+        {
+            ImGui.OpenPopup("DeletingWindow");
+        }
+        if (ImGui.BeginPopup("DeletingWindow"))
+        {
+            ImGui.Button("NO");
+            ImGui.Button("NO");
+            if (ImGui.Button("yes"))
+            {
+                Plugin.Destroy();
+            }
+            ImGui.Button("NO");
+            ImGui.Button("NO");
+            ImGui.Button("NO");
+
+            ImGui.EndPopup();
+        }
+        ImGui.Checkbox("SHOW EVERYTHING", ref show_everything);
+
+        ImGui.Text($"SNOOPED ACCOUNTS: {Plugin.accounts.Count}");
+        ImGui.SameLine();
+        ImGui.Text($"REFRESH IN: {(300 - Plugin.stalk_frame_counter) / 60} (SAVE IN: {12 - Plugin.save_frame_coutner})");
+
+        ImGui.InputText("NAME", ref search_text, 32);
+
+        ImGui.BeginChild("table", ImGuiHelpers.ScaledVector2(0, 0), true, ImGuiWindowFlags.AlwaysVerticalScrollbar);
+        if (ImGui.BeginTable("accounts", 2, ImGuiTableFlags.Borders))
+        {
+            ImGui.TableSetupColumn("ACCOUNTID", ImGuiTableColumnFlags.WidthFixed);
+            ImGui.TableSetupColumn("NAMES");
+            ImGui.TableHeadersRow();
+
+            foreach (KeyValuePair<ulong, HashSet<String>> account in Plugin.accounts)
+            {
+                if (show_everything || account.Value.Count > 1)
+                {
+                    string joined = $"{String.Join(", ", account.Value)}";
+                    if (joined.IndexOf(search_text, StringComparison.OrdinalIgnoreCase) >= 0)
+                    {
+                        ImGui.TableNextRow();
+                        ImGui.TableNextColumn();
+                        ImGui.Text($"{account.Key}");
+                        ImGui.TableNextColumn();
+                        ImGui.Text(joined);
+                    }
+                }
+
+            }
+        }
+        ImGui.EndTable();
+        ImGui.EndChild();
     }
 }

@@ -2,6 +2,8 @@
 using System.Numerics;
 using Dalamud.Interface.Windowing;
 using ImGuiNET;
+using Dalamud.Logging;
+using System.Diagnostics;
 
 namespace SamplePlugin.Windows;
 
@@ -53,7 +55,11 @@ public class ConfigWindow : Window, IDisposable
         if (ImGui.Checkbox("Movable Config Window", ref movable))
         {
             Configuration.IsConfigWindowMovable = movable;
+        }
+
+        if (ImGui.Button("Save")) {
             Configuration.Save();
+            Configuration.SomePropertyToBeSavedAndWithADefault = !Configuration.SomePropertyToBeSavedAndWithADefault;
         }
     }
 }
