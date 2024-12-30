@@ -5,7 +5,7 @@ using ImGuiNET;
 using Dalamud.Logging;
 using System.Diagnostics;
 
-namespace SamplePlugin.Windows;
+namespace StalkerPlugin.Windows;
 
 public class ConfigWindow : Window, IDisposable
 {

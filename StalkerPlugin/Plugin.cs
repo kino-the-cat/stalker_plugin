@@ -4,7 +4,7 @@ using Dalamud.Plugin;
 using System.IO;
 using Dalamud.Interface.Windowing;
 using Dalamud.Plugin.Services;
-using SamplePlugin.Windows;
+using StalkerPlugin.Windows;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Game.ClientState.Objects.Enums;
@@ -13,7 +13,7 @@ using System.Collections.Generic;
 using System;
 using System.Text;
 
-namespace SamplePlugin;
+namespace StalkerPlugin;
 
 public sealed class Plugin : IDalamudPlugin
 {
@@ -161,6 +161,10 @@ public sealed class Plugin : IDalamudPlugin
     public void Restore()
     {
         var dbPath = Path.Combine(PluginInterface.ConfigDirectory.FullName!, "stalk.csv");
+        if (!File.Exists(dbPath)) {
+            accounts = new Dictionary<ulong, HashSet<string>>();
+            return;
+        }
         var csv = File.ReadAllLines(dbPath);
 
         accounts.Clear();
