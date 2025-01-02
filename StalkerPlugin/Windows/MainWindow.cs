@@ -108,7 +108,6 @@ public class MainWindow : Window, IDisposable
                         ImGui.Text(joined);
                     }
                 }
-
             }
         }
         ImGui.EndTable();

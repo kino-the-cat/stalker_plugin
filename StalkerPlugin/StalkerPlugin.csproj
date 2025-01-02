@@ -9,8 +9,17 @@
     <PackageLicenseExpression>AGPL-3.0-or-later</PackageLicenseExpression>
     <IsPackable>false</IsPackable>
     		<DalamudLibPath>$(appdata)\XIVLauncher\addon\Hooks\dev\</DalamudLibPath>
-
   </PropertyGroup>
+
+  <!-- <PropertyGroup Condition="'$(Configuration)'=='Release'">
+  <DebugSymbols>False</DebugSymbols>
+  <DebugType>None</DebugType>
+</PropertyGroup> -->
+ <PropertyGroup>
+    <Deterministic>true</Deterministic>
+    <DeterministicSourcePaths>true</DeterministicSourcePaths>
+    <PathMap>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)'))=./</PathMap>
+ </PropertyGroup>
 
   <ItemGroup>
     <Content Include="..\Data\goat.png">
@@ -46,8 +55,8 @@
     </Reference>
   </ItemGroup>
   
-  <ItemGroup>
+  <!-- <ItemGroup>
     <PackageReference Include="npgsql" Version="9.0.2" />
-  </ItemGroup>
+  </ItemGroup> -->
 
 </Project>
